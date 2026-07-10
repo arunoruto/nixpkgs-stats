@@ -1,5 +1,6 @@
 site_name: nixpkgs-stats
 site_description: Package distribution statistics for the nixpkgs repository
+repo_url: https://github.com/arunoruto/nixpkgs-stats
 theme:
   name: material
 docs_dir: docs
