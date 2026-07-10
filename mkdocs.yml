@@ -1,0 +1,6 @@
+site_name: nixpkgs-stats
+site_description: Package distribution statistics for the nixpkgs repository
+theme:
+  name: material
+docs_dir: docs
+site_dir: site

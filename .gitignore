@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# mkdocs build output
+site/
+
+# generated chart HTML files
+docs/assets/
