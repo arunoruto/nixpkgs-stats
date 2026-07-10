@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 from nixpkgs_stats.heatmap import build_figure
 from nixpkgs_stats.scanner import get_repo_info, scan
@@ -52,7 +54,6 @@ if do_scan:
                 st.warning("No packages found in pkgs/by-name/.")
             else:
                 total = sum(counts.values())
-                top = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)[:5]
                 repo_info = get_repo_info(repo_path)
 
                 col_total, col_repo = st.columns([1, 2])
@@ -63,9 +64,6 @@ if do_scan:
                         st.caption(
                             f"Repo at `{repo_info['hash']}` ({repo_info['date']})"
                         )
-                st.caption(
-                    "Top prefixes: " + " | ".join(f"**{p}** ({c})" for p, c in top)
-                )
 
                 title = (
                     r"nixpkgs pkgs/by-name - Package Directories"
@@ -80,6 +78,53 @@ if do_scan:
                     st.error(f"Failed to render chart: {chart_err}")
                     st.write("Raw counts (first 20):")
                     st.json({k: counts[k] for k in list(counts)[:20]})
+
+                df = (
+                    pd.DataFrame(counts.items(), columns=["Prefix", "Count"])
+                    .sort_values("Count", ascending=False)
+                    .reset_index(drop=True)
+                )
+                df.index += 1
+                df.index.name = "#"
+
+                top5 = df.head(5)
+                bottom5 = df.tail(5)
+                sep = pd.DataFrame(
+                    [["...", "..."]],
+                    columns=["Prefix", "Count"],
+                    index=["..."] if not pd.__version__.startswith("0") else ["..."],
+                )
+                sep.index.name = "#"
+                table = pd.concat([top5, sep, bottom5])
+
+                cell_values = [
+                    [str(i) for i in table.index],
+                    table["Prefix"].tolist(),
+                    [str(c) for c in table["Count"].tolist()],
+                ]
+
+                table_fig = go.Figure(
+                    data=[
+                        go.Table(
+                            header=dict(
+                                values=["#", "Prefix", "Count"],
+                                align="center",
+                                font=dict(size=13),
+                            ),
+                            cells=dict(
+                                values=cell_values,
+                                align="center",
+                                font=dict(size=12),
+                                height=28,
+                            ),
+                        )
+                    ]
+                )
+                table_fig.update_layout(
+                    margin=dict(l=0, r=0, t=0, b=0),
+                    height=380,
+                )
+                st.plotly_chart(table_fig)
 
         except FileNotFoundError as e:
             st.error(str(e))
