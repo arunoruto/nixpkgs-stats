@@ -398,6 +398,7 @@ name = "nixpkgs-stats"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "gitpython" },
     { name = "kaleido" },
     { name = "pandas" },
     { name = "plotly" },
@@ -406,6 +407,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "gitpython", specifier = ">=3.1.50" },
     { name = "kaleido", specifier = ">=1.3.0" },
     { name = "pandas" },
     { name = "plotly" },

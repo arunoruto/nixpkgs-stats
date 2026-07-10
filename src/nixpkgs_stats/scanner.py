@@ -1,6 +1,21 @@
 import os
 from pathlib import Path
 
+from git import InvalidGitRepositoryError, Repo
+
+
+def get_repo_info(repo_path: str) -> dict[str, str] | None:
+    try:
+        repo = Repo(repo_path, search_parent_directories=False)
+    except InvalidGitRepositoryError:
+        return None
+
+    head = repo.head.commit
+    return {
+        "hash": head.hexsha[:7],
+        "date": head.committed_datetime.strftime("%Y-%m-%d"),
+    }
+
 
 def scan(
     repo_path: str, mode: str = "directories", exclude_lib: bool = False

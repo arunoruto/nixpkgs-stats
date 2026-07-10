@@ -2,7 +2,7 @@ from pathlib import Path
 
 import streamlit as st
 from nixpkgs_stats.heatmap import build_figure
-from nixpkgs_stats.scanner import scan
+from nixpkgs_stats.scanner import get_repo_info, scan
 
 st.set_page_config(page_title="nixpkgs Stats", layout="centered")
 st.title("nixpkgs Package Distribution Heatmap")
@@ -53,8 +53,16 @@ if do_scan:
             else:
                 total = sum(counts.values())
                 top = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)[:5]
+                repo_info = get_repo_info(repo_path)
 
-                st.subheader(f"Total entries: **{total:,}**")
+                col_total, col_repo = st.columns([1, 2])
+                with col_total:
+                    st.subheader(f"Total entries: **{total:,}**")
+                with col_repo:
+                    if repo_info:
+                        st.caption(
+                            f"Repo at `{repo_info['hash']}` ({repo_info['date']})"
+                        )
                 st.caption(
                     "Top prefixes: " + " | ".join(f"**{p}** ({c})" for p, c in top)
                 )
