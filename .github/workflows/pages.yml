@@ -1,0 +1,52 @@
+name: Deploy to GitHub Pages
+
+on:
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - name: Clone nixpkgs (sparse — pkgs/by-name/ only)
+        run: |
+          git clone --depth 1 --filter=blob:none --sparse \
+            https://github.com/NixOS/nixpkgs.git nixpkgs
+          cd nixpkgs
+          git sparse-checkout set pkgs/by-name
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Generate charts
+        run: uv run python scripts/generate_site.py --repo nixpkgs
+
+      - name: Build site
+        run: uv run mkdocs build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
