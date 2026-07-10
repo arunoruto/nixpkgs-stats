@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 from nixpkgs_stats.heatmap import build_figure
+from nixpkgs_stats.histogram import build_histogram
 from nixpkgs_stats.scanner import get_repo_info, scan
 
 st.set_page_config(page_title="nixpkgs Stats", layout="centered")
@@ -125,6 +126,10 @@ if do_scan:
                     height=380,
                 )
                 st.plotly_chart(table_fig)
+
+                hist_title = "Package Count per Prefix (descending)"
+                hist_fig = build_histogram(counts, title=hist_title)
+                st.plotly_chart(hist_fig)
 
         except FileNotFoundError as e:
             st.error(str(e))
