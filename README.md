@@ -7,6 +7,7 @@ Scans `pkgs/by-name/` and renders a heatmap showing how many packages fall under
 ## Features
 
 - Point at any nixpkgs checkout (fork, tag, commit) on disk
+- Displays the repo's **latest commit hash and date**
 - Toggle between counting **package directories** or **all `.nix` files**
 - **Logarithmic color scale** for better contrast when one prefix dominates
 - Optional **exclusion of `lib*` packages** in the `li/` prefix
@@ -34,4 +35,5 @@ uv run streamlit run scripts/app.py
 - [plotly](https://plotly.com/) — interactive charts
 - [pandas](https://pandas.pydata.org/) — data handling
 - [numpy](https://numpy.org/) — log transforms
+- [gitpython](https://github.com/gitpython-developers/GitPython) — repo metadata
 - [kaleido](https://github.com/nicolaskruchten/kaleido) — static image export
